@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ScheduleOrganizerView : UIView
+@interface ScheduleOrganizerView : UIView <UIGestureRecognizerDelegate>
 
 @end

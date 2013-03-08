@@ -19,6 +19,10 @@
 		6A90DBC516E7406700CC8A0F /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A90DBC316E7406700CC8A0F /* MainStoryboard.storyboard */; };
 		6A90DBC816E7406700CC8A0F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A90DBC716E7406700CC8A0F /* ViewController.m */; };
 		6A90DBD016E7444800CC8A0F /* ScheduleOrganizerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A90DBCF16E7444800CC8A0F /* ScheduleOrganizerView.m */; };
+		6ADF958016E9A7B4002C6944 /* LightningData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF957F16E9A7B4002C6944 /* LightningData.m */; };
+		6ADF958416E9BC78002C6944 /* Vector2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF958316E9BC78002C6944 /* Vector2D.m */; };
+		6ADF958616E9C64A002C6944 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADF958516E9C64A002C6944 /* Accelerate.framework */; };
+		6AEDF46216E88C9000672F1D /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 6AEDF46116E88C9000672F1D /* TODO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +44,12 @@
 		6A90DBC716E7406700CC8A0F /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		6A90DBCE16E7444800CC8A0F /* ScheduleOrganizerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleOrganizerView.h; sourceTree = "<group>"; };
 		6A90DBCF16E7444800CC8A0F /* ScheduleOrganizerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleOrganizerView.m; sourceTree = "<group>"; };
+		6ADF957E16E9A7B4002C6944 /* LightningData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightningData.h; sourceTree = "<group>"; };
+		6ADF957F16E9A7B4002C6944 /* LightningData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LightningData.m; sourceTree = "<group>"; };
+		6ADF958216E9BC78002C6944 /* Vector2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector2D.h; sourceTree = "<group>"; };
+		6ADF958316E9BC78002C6944 /* Vector2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Vector2D.m; sourceTree = "<group>"; };
+		6ADF958516E9C64A002C6944 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		6AEDF46116E88C9000672F1D /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6ADF958616E9C64A002C6944 /* Accelerate.framework in Frameworks */,
 				6A90DBAC16E7406600CC8A0F /* UIKit.framework in Frameworks */,
 				6A90DBAE16E7406600CC8A0F /* Foundation.framework in Frameworks */,
 				6A90DBB016E7406600CC8A0F /* CoreGraphics.framework in Frameworks */,
@@ -59,6 +70,9 @@
 		6A90DB9C16E7406600CC8A0F = {
 			isa = PBXGroup;
 			children = (
+				6ADF958516E9C64A002C6944 /* Accelerate.framework */,
+				6ADF958216E9BC78002C6944 /* Vector2D.h */,
+				6ADF958316E9BC78002C6944 /* Vector2D.m */,
 				6A90DBB116E7406600CC8A0F /* ScheduleOrganizerView */,
 				6A90DBAA16E7406600CC8A0F /* Frameworks */,
 				6A90DBA816E7406600CC8A0F /* Products */,
@@ -94,6 +108,8 @@
 				6A90DBB216E7406600CC8A0F /* Supporting Files */,
 				6A90DBCE16E7444800CC8A0F /* ScheduleOrganizerView.h */,
 				6A90DBCF16E7444800CC8A0F /* ScheduleOrganizerView.m */,
+				6ADF957E16E9A7B4002C6944 /* LightningData.h */,
+				6ADF957F16E9A7B4002C6944 /* LightningData.m */,
 			);
 			path = ScheduleOrganizerView;
 			sourceTree = "<group>";
@@ -108,6 +124,7 @@
 				6A90DBBD16E7406600CC8A0F /* Default.png */,
 				6A90DBBF16E7406600CC8A0F /* Default@2x.png */,
 				6A90DBC116E7406700CC8A0F /* Default-568h@2x.png */,
+				6AEDF46116E88C9000672F1D /* TODO */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -168,6 +185,7 @@
 				6A90DBC016E7406600CC8A0F /* Default@2x.png in Resources */,
 				6A90DBC216E7406700CC8A0F /* Default-568h@2x.png in Resources */,
 				6A90DBC516E7406700CC8A0F /* MainStoryboard.storyboard in Resources */,
+				6AEDF46216E88C9000672F1D /* TODO in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,6 +200,8 @@
 				6A90DBBC16E7406600CC8A0F /* AppDelegate.m in Sources */,
 				6A90DBC816E7406700CC8A0F /* ViewController.m in Sources */,
 				6A90DBD016E7444800CC8A0F /* ScheduleOrganizerView.m in Sources */,
+				6ADF958016E9A7B4002C6944 /* LightningData.m in Sources */,
+				6ADF958416E9BC78002C6944 /* Vector2D.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +318,7 @@
 				6A90DBCD16E7406700CC8A0F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

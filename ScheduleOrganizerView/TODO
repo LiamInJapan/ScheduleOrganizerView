@@ -1,0 +1,9 @@
+Allow creation of new "arcs" with long press
+Attach icons/bubbles to arcs
+Pinch-stretch of arcs
+Fix layout bugs
+Effects:
+    lightning/glow of selected/moving arc
+    effect/color between colliding arcs
+    Radar-over-time effect
+Double Tap Zoom

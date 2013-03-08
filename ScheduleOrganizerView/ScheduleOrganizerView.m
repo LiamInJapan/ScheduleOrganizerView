@@ -7,25 +7,44 @@
 //
 
 #import "ScheduleOrganizerView.h"
+#import "LightningData.h"
 
-#define ARC_CIRCLE_GAP 20.0f
+#define ARC_CIRCLE_GAP 5.0f
 #define CIRCLE_RADIUS 150.0f
 #define ARC_RADIUS 20.0f
+#define ARC_POINT_RADIUS 20.0f
 
 #define   DEGREES_TO_RADIANS(degrees)  ((M_PI * degrees)/ 180)
 
 @implementation ScheduleOrganizerView
 
 CGFloat arcAngle;
-CGPoint arcPoint;
+NSMutableArray * arcPoints;
+BOOL holdState;
+LightningData * lightning;
+
+//CGPoint arcPoint;
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        arcPoint = CGPointMake(10.0f, 10.0f);
+        arcPoints = [[NSMutableArray alloc] init];
+        
+        
+        //arcPoint = CGPointMake(10.0f, 10.0f);
         arcAngle = 40.0f;
+        holdState = false;
+        
+        UILongPressGestureRecognizer *longpressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressHandler:)];
+        longpressGesture.minimumPressDuration = 1;
+        [longpressGesture setDelegate:self];
+        [self addGestureRecognizer:longpressGesture];
+        
+        lightning = [[LightningData alloc] init];
+        
+        
     }
     return self;
 }
@@ -49,10 +68,77 @@ float PointPairToBearingDegrees(CGPoint startingPoint, CGPoint endingPoint)
     return CGPointMake(x, y);
 }
 
-- (void)touchBegan:(NSSet *)touches withEvent:(UIEvent *)event
+-(float)distanceFrom:(CGPoint)point1 to:(CGPoint)point2
 {
+    CGFloat xDist = (point2.x - point1.x);
+    CGFloat yDist = (point2.y - point1.y);
+    return sqrt((xDist * xDist) + (yDist * yDist));
 }
 
+- (BOOL)checkIfTouchIsOnPoint:(CGPoint)touch
+{
+    for (NSValue * pointVal in arcPoints)
+    {
+        CGPoint point = [pointVal CGPointValue];
+        
+        if([self distanceFrom:touch to:point] < ARC_POINT_RADIUS)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+    
+    return false;
+}
+
+
+- (void)longPressHandler:(UILongPressGestureRecognizer *)gestureRecognizer
+{
+    [arcPoints addObject:[NSValue valueWithCGPoint:[gestureRecognizer locationInView:self]]];
+    [self setNeedsDisplay];
+}
+
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    NSLog(@"- (void)touchBegan:(NSSet *)touches withEvent:(UIEvent *)event");
+    
+    UITouch * touch = [touches anyObject];
+    CGPoint location = [touch locationInView:self];
+    
+    if([self checkIfTouchIsOnPoint:location])
+    {
+        
+    }
+    else
+    {
+        NSLog(@"touchme");
+        holdState = true;
+        
+    }
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch * touch = [touches anyObject];
+    CGPoint location = [touch locationInView:self];
+                                   
+    arcAngle = PointPairToBearingDegrees(self.center, location);
+    //arcPoint = [self calculatePointAtEdgeOfCircleWithRadius:(CIRCLE_RADIUS/2)+50.0f
+    //                                              andCenter:self.center
+    //                                                atAngle:arcAngle];
+    [self setNeedsDisplay];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    holdState = false;
+}
+                               
 static inline double radians (double degrees) { return degrees * M_PI/180; }
 
 CGMutablePathRef createArcPathFromBottomOfRect(CGRect rect, CGFloat arcHeight) {
@@ -80,17 +166,7 @@ CGMutablePathRef createArcPathFromBottomOfRect(CGRect rect, CGFloat arcHeight) {
     
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    
-    UITouch * touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
-    
-    arcAngle = PointPairToBearingDegrees(self.center, location);
-    arcPoint = [self calculatePointAtEdgeOfCircleWithRadius:(CIRCLE_RADIUS/2)+50.0f
-                                                  andCenter:self.center
-                                                    atAngle:arcAngle];
-    [self setNeedsDisplay];
-}
+
 
 void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor,
                         CGColorRef endColor) {
@@ -117,11 +193,25 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     CGColorSpaceRelease(colorSpace);
 }
 
+- (void)drawArcPointsOnContext:(CGContextRef)context
+{
+    for (NSValue * pointVal in arcPoints)
+    {
+        CGPoint arcPoint = [pointVal CGPointValue];
+        
+        CGRect circlePointRect = (CGRectMake((arcPoint.x)-ARC_POINT_RADIUS/2.0f,
+                                             (arcPoint.y)-ARC_POINT_RADIUS/2.0f,
+                                            ARC_POINT_RADIUS,
+                                             ARC_POINT_RADIUS));
+        
+        CGContextFillEllipseInRect(context, circlePointRect);
+    }
+}
+
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
-    NSLog(@"drawRect");
     CGContextRef contextRef = UIGraphicsGetCurrentContext();
     
     CGRect drawRect = CGRectMake(rect.origin.x, rect.origin.y,rect.size.width, rect.size.height);
@@ -135,32 +225,8 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     CGRect circlePointRect = (CGRectMake((rect.size.width/2)-CIRCLE_RADIUS/2.0f, (rect.size.height/2)-CIRCLE_RADIUS/2.0f, CIRCLE_RADIUS, CIRCLE_RADIUS));
     CGContextFillEllipseInRect(contextRef, circlePointRect);
     
-    /*CGRect arcPointRect = (CGRectMake((arcPoint.x)-ARC_RADIUS/2.0f, (arcPoint.y)-ARC_RADIUS/2.0f, ARC_RADIUS, ARC_RADIUS));
-    CGContextFillEllipseInRect(contextRef, arcPointRect);*/
-    //
-    
-    //CGColorRef lightGrayColor = [UIColor colorWithRed:230.0/255.0 green:230.0/255.0
-    //                                             blue:230.0/255.0 alpha:1.0].CGColor;
-    //CGColorRef darkGrayColor = [UIColor colorWithRed:187.0/255.0 green:187.0/255.0
-    //                                            blue:187.0/255.0 alpha:1.0].CGColor;
-    
-    CGRect arcRect = circlePointRect;
+    /*CGRect arcRect = circlePointRect;
     arcRect.size.height = 1;
-    
-    /*CGContextSaveGState(contextRef);
-    CGMutablePathRef arcPath = createArcPathFromBottomOfRect(arcRect, 4.0);
-    CGContextAddPath(contextRef, arcPath);
-    CGContextClip(contextRef);
-    drawLinearGradient(contextRef, arcRect, lightGrayColor, darkGrayColor);
-    CGContextRestoreGState(contextRef);
-    
-    CFRelease(arcPath);*/
-    
-    /*CGContextSetLineWidth(contextRef, 2);
-    CGContextSetStrokeColorWithColor(contextRef, [UIColor blueColor].CGColor);
-    CGContextMoveToPoint(contextRef, 10, 500);
-    CGContextAddArc(contextRef, 60, 500, 50, M_PI / 2, M_PI, 0);
-    CGContextStrokePath(contextRef);*/
     
     CGFloat minAngle = arcAngle - 10.0f;
     CGFloat maxAngle = arcAngle + 10.0f;
@@ -180,7 +246,12 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
                                                        endAngle:DEGREES_TO_RADIANS(maxAngle)
                                                       clockwise:YES];
     
-    [aPath stroke];
+    [aPath stroke];*/
+    
+    [self drawArcPointsOnContext:contextRef];
+    [lightning regenerateData];
+    [lightning renderDataOntoContext:contextRef];
+    
 }
 
 
