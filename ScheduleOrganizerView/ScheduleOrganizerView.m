@@ -107,7 +107,7 @@ float PointPairToBearingDegrees(CGPoint startingPoint, CGPoint endingPoint)
 - (void)touchLoop
 {
     CGPoint center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
-    [lightning regenerateBoltDataBetweenPoint:center andPoint:location];
+    [lightning regenerateForkDataBetweenPoint:location andPoint:center];
     [self setNeedsDisplay];
 }
 
@@ -235,7 +235,7 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     CGContextSetRGBStrokeColor(contextRef, 0, 0, 0, 1.0);
     
     CGRect circlePointRect = (CGRectMake((rect.size.width/2)-CIRCLE_RADIUS/2.0f, (rect.size.height/2)-CIRCLE_RADIUS/2.0f, CIRCLE_RADIUS, CIRCLE_RADIUS));
-    CGContextFillEllipseInRect(contextRef, circlePointRect);
+    //CGContextFillEllipseInRect(contextRef, circlePointRect);
     
     /*CGRect arcRect = circlePointRect;
     arcRect.size.height = 1;
