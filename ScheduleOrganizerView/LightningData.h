@@ -10,7 +10,9 @@
 
 @interface LightningData : NSObject
 
+- (void)clearData;
 - (void)renderDataOntoContext:(CGContextRef)context;
-- (void)regenerateData;
+- (void)regenerateBoltDataBetweenPoint:(CGPoint)a andPoint:(CGPoint)b;
+- (void)regenerateForkDataBetweenPoint:(CGPoint)a andPoint:(CGPoint)b;
 
 @end

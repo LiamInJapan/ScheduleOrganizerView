@@ -25,6 +25,7 @@ NSMutableArray * lineSegments;
 
 - (void)renderDataOntoContext:(CGContextRef)context
 {
+    NSLog(@"- (void)renderDataOntoContext:(CGContextRef)context");
     CGContextSetLineWidth(context, 1.0);
     
     for (NSValue * lineVal in lineSegments)
@@ -32,7 +33,7 @@ NSMutableArray * lineSegments;
         CGLine l;
         [lineVal getValue:&l];
         
-        CGContextMoveToPoint(context, 0.0f, 0.0f);
+        //CGContextMoveToPoint(context, 0.0f, 0.0f);
         CGContextMoveToPoint(context, l.start.x, l.start.y);
         CGContextAddLineToPoint(context, l.end.x, l.end.y);
         CGContextStrokePath(context);
@@ -95,36 +96,41 @@ NSMutableArray * lineSegments;
     return sqrt((xDist * xDist) + (yDist * yDist));
 }
 
-- (void)regenerateData
+- (void)clearData
+{
+    [lineSegments removeAllObjects];
+}
+
+/*
+ direction = midPoint - startPoint;
+ splitEnd = Rotate(direction, randomSmallAngle)*lengthScale + midPoint; // lengthScale is, for best results, < 1.  0.7 is a good value.
+ segmentList.Add(new Segment(midPoint, splitEnd));
+ */
+
+- (void)regenerateForkDataBetweenPoint:(CGPoint)a andPoint:(CGPoint)b
 {
     NSLog(@"- (void)regenerateData");
     
-    [lineSegments removeAllObjects];
+    [self clearData];
     CGLine line;
-    line.start = CGPointMake(100, 100);
-    line.end = CGPointMake(300, 300);
-    
-    srand((int)time(NULL));
+    line.start = a;
+    line.end = b;
     
     [lineSegments addObject:[NSValue value:&line withObjCType:@encode(struct Line)]];
     
+    float offsetAmount = 1.0f;
+    
     for(int i = 0; i < NUM_GENERATIONS; i++)
     {
-        float offsetAmount = 1.0f;
-        
         int countAtBeginningOfGeneration = lineSegments.count;
         
         for (int j = 0; j < countAtBeginningOfGeneration; j++)
         {
+            NSValue *lineVal = [lineSegments objectAtIndex:j];
             CGLine l;
-            [[lineSegments objectAtIndex:j] getValue:&l];
+            [lineVal getValue:&l];
             
-            //float midx = ((l.start.x + l.end.x) / 2);
-            //float midy = ((l.end.x + l.end.y) / 2);
-            
-            //CGPoint mid = CGPointMake(midx, midy);
-            
-            float splitpoint = (((rand() / RAND_MAX) * 100) -50.0f) *offsetAmount;
+            float splitpoint = ((((float)arc4random()/0x100000000)*100) - 50.0f) * offsetAmount;
             
             CGPoint perpPoint = [self intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint] atPoint:0.5f];
             
@@ -136,12 +142,60 @@ NSMutableArray * lineSegments;
             secondHalf.start = perpPoint;
             secondHalf.end = l.end;
             
-            [lineSegments removeObjectAtIndex:j];
+            [lineSegments removeObject:lineVal];
             [lineSegments addObject:[NSValue value:&firstHalf withObjCType:@encode(struct Line)]];
             [lineSegments addObject:[NSValue value:&secondHalf withObjCType:@encode(struct Line)]];
             
-            //segmentList.Add(new Segment(l.start, midPoint));
-            //segmentList.Add(new Segment(midPoint, endPoint));
+            
+            /*direction = midPoint - startPoint;
+            splitEnd = Rotate(direction, randomSmallAngle)*lengthScale + midPoint; // lengthScale is, for best results, < 1.  0.7 is a good value.
+            segmentList.Add(new Segment(midPoint, splitEnd));*/
+        }
+        
+        offsetAmount /= 2;
+    }
+}
+
+- (void)regenerateBoltDataBetweenPoint:(CGPoint)a andPoint:(CGPoint)b
+{
+    NSLog(@"- (void)regenerateData");
+    
+    [self clearData];
+    CGLine line;
+    line.start = a;
+    line.end = b;
+    
+    [lineSegments addObject:[NSValue value:&line withObjCType:@encode(struct Line)]];
+    
+    float offsetAmount = 1.0f;
+    
+    for(int i = 0; i < NUM_GENERATIONS; i++)
+    {
+        int countAtBeginningOfGeneration = lineSegments.count;
+        
+        for (int j = 0; j < countAtBeginningOfGeneration; j++)
+        {
+            NSValue *lineVal = [lineSegments objectAtIndex:j];
+            CGLine l;
+            [lineVal getValue:&l];
+            
+            float splitpoint = ((((float)arc4random()/0x100000000)*100) - 50.0f) * offsetAmount;
+            
+            CGPoint perpPoint = [self intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint] atPoint:0.5f];
+            
+            CGLine firstHalf;
+            CGLine secondHalf;
+            
+            firstHalf.start = l.start;
+            firstHalf.end = perpPoint;
+            secondHalf.start = perpPoint;
+            secondHalf.end = l.end;
+            
+            [lineSegments removeObject:lineVal];
+            [lineSegments addObject:[NSValue value:&firstHalf withObjCType:@encode(struct Line)]];
+            [lineSegments addObject:[NSValue value:&secondHalf withObjCType:@encode(struct Line)]];
+            
+            
         }
         
         offsetAmount /= 2;
@@ -156,7 +210,8 @@ NSMutableArray * lineSegments;
     {
         // Initialization code
         lineSegments = [[NSMutableArray alloc] init];
-        [self regenerateData];
+        //[self regenerateData];
+        srand((int)time(NULL));
     }
     return self;
 }

@@ -19,9 +19,11 @@
 @implementation ScheduleOrganizerView
 
 CGFloat arcAngle;
+CGPoint location;	
 NSMutableArray * arcPoints;
 BOOL holdState;
 LightningData * lightning;
+NSTimer * timer;
 
 //CGPoint arcPoint;
 
@@ -37,11 +39,11 @@ LightningData * lightning;
         arcAngle = 40.0f;
         holdState = false;
         
-        UILongPressGestureRecognizer *longpressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressHandler:)];
+        /*UILongPressGestureRecognizer *longpressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressHandler:)];
         longpressGesture.minimumPressDuration = 1;
         [longpressGesture setDelegate:self];
         [self addGestureRecognizer:longpressGesture];
-        
+        */
         lightning = [[LightningData alloc] init];
         
         
@@ -102,13 +104,21 @@ float PointPairToBearingDegrees(CGPoint startingPoint, CGPoint endingPoint)
     [self setNeedsDisplay];
 }
 
+- (void)touchLoop
+{
+    CGPoint center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
+    [lightning regenerateBoltDataBetweenPoint:center andPoint:location];
+    [self setNeedsDisplay];
+}
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     NSLog(@"- (void)touchBegan:(NSSet *)touches withEvent:(UIEvent *)event");
     
     UITouch * touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
+    location = [touch locationInView:self];
+    
+    timer = [NSTimer scheduledTimerWithTimeInterval:0.03f target:self selector:@selector(touchLoop) userInfo:nil repeats:YES];
     
     if([self checkIfTouchIsOnPoint:location])
     {
@@ -125,17 +135,19 @@ float PointPairToBearingDegrees(CGPoint startingPoint, CGPoint endingPoint)
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
     UITouch * touch = [touches anyObject];
-    CGPoint location = [touch locationInView:self];
+    location = [touch locationInView:self];
                                    
     arcAngle = PointPairToBearingDegrees(self.center, location);
     //arcPoint = [self calculatePointAtEdgeOfCircleWithRadius:(CIRCLE_RADIUS/2)+50.0f
     //                                              andCenter:self.center
     //                                                atAngle:arcAngle];
-    [self setNeedsDisplay];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    [lightning clearData];
+    [timer invalidate];
+    [self setNeedsDisplay];
     holdState = false;
 }
                                
@@ -249,7 +261,7 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     [aPath stroke];*/
     
     [self drawArcPointsOnContext:contextRef];
-    [lightning regenerateData];
+    
     [lightning renderDataOntoContext:contextRef];
     
 }
