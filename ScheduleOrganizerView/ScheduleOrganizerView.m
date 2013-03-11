@@ -10,7 +10,7 @@
 #import "LightningData.h"
 
 #define ARC_CIRCLE_GAP 5.0f
-#define CIRCLE_RADIUS 150.0f
+#define CIRCLE_RADIUS 100.0f
 #define ARC_RADIUS 20.0f
 #define ARC_POINT_RADIUS 20.0f
 
@@ -235,7 +235,7 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     CGContextSetRGBStrokeColor(contextRef, 0, 0, 0, 1.0);
     
     CGRect circlePointRect = (CGRectMake((rect.size.width/2)-CIRCLE_RADIUS/2.0f, (rect.size.height/2)-CIRCLE_RADIUS/2.0f, CIRCLE_RADIUS, CIRCLE_RADIUS));
-    //CGContextFillEllipseInRect(contextRef, circlePointRect);
+    CGContextFillEllipseInRect(contextRef, circlePointRect);
     
     /*CGRect arcRect = circlePointRect;
     arcRect.size.height = 1;
