@@ -8,6 +8,7 @@
 
 #import "ScheduleOrganizerView.h"
 #import "LightningData.h"
+#import "Common.h"
 
 #define ARC_CIRCLE_GAP 5.0f
 #define CIRCLE_RADIUS 100.0f
@@ -18,14 +19,52 @@
 
 @implementation ScheduleOrganizerView
 
+typedef struct controlPoint
+{
+    CGPoint position;
+    bool held;
+    bool tweenin;
+    
+}ControlPoint;
+
+int heldPoint;
 CGFloat arcAngle;
-CGPoint location;	
 NSMutableArray * arcPoints;
-BOOL holdState;
-LightningData * lightning;
+CGPoint location;
+//LightningData * lightning;
 NSTimer * timer;
 
 //CGPoint arcPoint;
+
+- (void)spawnPoint:(CGPoint)location
+{
+    ControlPoint cp;
+    cp.position = location;
+    cp.held = true;
+    cp.tweenin = true;
+    //[arcPoints addObject:[NSValue valueWithCGPoint:location]];
+    //[arcPoints addObject:  cp];
+    [arcPoints addObject:[NSValue value:&cp withObjCType:@encode(ControlPoint)]];
+    heldPoint = arcPoints.count-1;
+    [self setNeedsDisplay];
+}
+
+- (void)longPressHandler:(UILongPressGestureRecognizer*)gesture
+{
+    if ( gesture.state == UIGestureRecognizerStateBegan )
+    {
+        [self spawnPoint:[gesture locationInView:self]];
+    }
+    if ( gesture.state == UIGestureRecognizerStateChanged )
+    {
+        //[self checkAllPointsForHeldAndMoveIfHeld:[gesture locationInView:self]];
+        [self moveHeldPoint:[gesture locationInView:self]];
+    }
+    if ( gesture.state == UIGestureRecognizerStateEnded)
+    {
+        heldPoint = -1;
+    }
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -37,14 +76,14 @@ NSTimer * timer;
         
         //arcPoint = CGPointMake(10.0f, 10.0f);
         arcAngle = 40.0f;
-        holdState = false;
         
-        /*UILongPressGestureRecognizer *longpressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressHandler:)];
+        UILongPressGestureRecognizer *longpressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressHandler:)];
         longpressGesture.minimumPressDuration = 1;
         [longpressGesture setDelegate:self];
         [self addGestureRecognizer:longpressGesture];
-        */
-        lightning = [[LightningData alloc] init];
+        
+        heldPoint = -1;
+        //lightning = [[LightningData alloc] init];
         
         
     }
@@ -79,35 +118,48 @@ float PointPairToBearingDegrees(CGPoint startingPoint, CGPoint endingPoint)
 
 - (BOOL)checkIfTouchIsOnPoint:(CGPoint)touch
 {
-    for (NSValue * pointVal in arcPoints)
+    if(arcPoints.count != 0)
     {
-        CGPoint point = [pointVal CGPointValue];
-        
-        if([self distanceFrom:touch to:point] < ARC_POINT_RADIUS)
+        for(int i = 0; i < arcPoints.count-1; i++)
         {
-            return true;
+            ControlPoint cp;
+            [[arcPoints objectAtIndex:i] getValue:&cp];
+            
+            //ControlPoint
+            //CGPoint point = [pointVal CGPointValue];
+            
+            if([self distanceFrom:touch to:cp.position] < ARC_POINT_RADIUS)
+            {
+                heldPoint = i;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
-        {
-            return false;
-        }
+        /*for (NSValue * pointVal in arcPoints)
+         {
+         
+         }*/
         
+        return false;
     }
     
     return false;
 }
 
 
-- (void)longPressHandler:(UILongPressGestureRecognizer *)gestureRecognizer
+/*- (void)longPressHandler:(UILongPressGestureRecognizer *)gestureRecognizer
 {
     [arcPoints addObject:[NSValue valueWithCGPoint:[gestureRecognizer locationInView:self]]];
     [self setNeedsDisplay];
-}
+}*/
 
 - (void)touchLoop
 {
     CGPoint center = CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
-    [lightning regenerateForkDataBetweenPoint:location andPoint:center];
+    //[lightning regenerateForkDataBetweenPoint:location andPoint:center];
     [self setNeedsDisplay];
 }
 
@@ -126,29 +178,104 @@ float PointPairToBearingDegrees(CGPoint startingPoint, CGPoint endingPoint)
     }
     else
     {
-        NSLog(@"touchme");
-        holdState = true;
         
     }
 }
 
+// TODO - finish this function, generic for all 4 quadrants
+- (NSArray *)generateSplitLineBetweenPoint:(CGPoint)a andPoint:(CGPoint)b
+{
+    CGLine line;
+    line.start = a;
+    line.start = b;
+    CGPoint midpoint = [Common intermediatePointOnLine:line atPoint:0.5f];
+    CGPoint above = CGPointMake(midpoint.x,a.y);
+    CGPoint aboveside = CGPointMake(midpoint.x-(a.y-midpoint.y),0.0f);
+    CGPoint below = CGPointMake(0.0f,0.0f);
+    CGPoint belowside = CGPointMake(0.0f,0.0f);
+    CGLine firstsection;
+    firstsection.start = a;
+    firstsection.end = aboveside;
+    CGLine secondsection;
+    secondsection.start = aboveside;
+    secondsection.end = belowside;
+    CGLine thirdsection;
+    thirdsection.start = belowside;
+    thirdsection.end = b;
+    
+    NSMutableArray * ret = [[NSMutableArray alloc] initWithCapacity:3];
+    [ret addObject:[NSValue value:&firstsection withObjCType:@encode(struct Line)]];
+    [ret addObject:[NSValue value:&secondsection withObjCType:@encode(struct Line)]];
+    [ret addObject:[NSValue value:&thirdsection withObjCType:@encode(struct Line)]];
+    
+    return ret;
+}
+
+- (void)moveHeldPoint:(CGPoint)location
+{
+    if(heldPoint != -1)
+    {
+        NSLog(@"HELD!%f %f", location.x, location.y);
+        
+        ControlPoint cp;
+        [[arcPoints objectAtIndex:heldPoint] getValue:&cp];
+        
+        if(cp.held == true)
+        {
+            cp.position = location;
+            
+            [arcPoints replaceObjectAtIndex:heldPoint withObject:[NSValue value:&cp withObjCType:@encode(ControlPoint)]];
+            
+            [self setNeedsDisplay];
+        }
+    }
+    
+}
+- (void)checkAllPointsForHeldAndMoveIfHeld:(CGPoint)location
+{
+    for(int i = 0; i < arcPoints.count; i++)
+    {
+        ControlPoint cp;
+        [[arcPoints objectAtIndex:i] getValue:&cp];
+        
+        if(cp.held == true)
+        {
+            NSLog(@"HELD!%f %f", location.x, location.y);
+            cp.position = location;
+            
+            [arcPoints replaceObjectAtIndex:i withObject:[NSValue value:&cp withObjCType:@encode(ControlPoint)]];
+            
+            [self setNeedsDisplay];
+            break;
+        }
+    }
+    for (NSValue * cpVal in arcPoints)
+    {
+        
+    }
+}
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSLog(@"- (void)touchMoved:(NSSet *)touches withEvent:(UIEvent *)event");
+    
     UITouch * touch = [touches anyObject];
     location = [touch locationInView:self];
-                                   
+    
     arcAngle = PointPairToBearingDegrees(self.center, location);
     //arcPoint = [self calculatePointAtEdgeOfCircleWithRadius:(CIRCLE_RADIUS/2)+50.0f
     //                                              andCenter:self.center
     //                                                atAngle:arcAngle];
+    
+    //[self checkAllPointsForHeldAndMoveIfHeld:location];
+    [self moveHeldPoint:location];
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [lightning clearData];
+    //[lightning clearData];
     [timer invalidate];
     [self setNeedsDisplay];
-    holdState = false;
+    heldPoint = -1;
 }
                                
 static inline double radians (double degrees) { return degrees * M_PI/180; }
@@ -178,8 +305,6 @@ CGMutablePathRef createArcPathFromBottomOfRect(CGRect rect, CGFloat arcHeight) {
     
 }
 
-
-
 void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor,
                         CGColorRef endColor) {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -189,8 +314,6 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     
     CGGradientRef gradient = CGGradientCreateWithColors(colorSpace,
                                                         (__bridge CFArrayRef) colors, locations);
-    
-    // More coming...
     
     CGPoint startPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
     CGPoint endPoint = CGPointMake(CGRectGetMidX(rect), CGRectGetMaxY(rect));
@@ -207,12 +330,15 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
 
 - (void)drawArcPointsOnContext:(CGContextRef)context
 {
-    for (NSValue * pointVal in arcPoints)
+    CGContextSetRGBFillColor(context, 0.0f, 0.0f, 0.0f, 1.0f);
+    
+    for (NSValue * cpVal in arcPoints)
     {
-        CGPoint arcPoint = [pointVal CGPointValue];
+        ControlPoint cp;
+        [cpVal getValue:&cp];
         
-        CGRect circlePointRect = (CGRectMake((arcPoint.x)-ARC_POINT_RADIUS/2.0f,
-                                             (arcPoint.y)-ARC_POINT_RADIUS/2.0f,
+        CGRect circlePointRect = (CGRectMake((cp.position.x)-ARC_POINT_RADIUS/2.0f,
+                                             (cp.position.y)-ARC_POINT_RADIUS/2.0f,
                                             ARC_POINT_RADIUS,
                                              ARC_POINT_RADIUS));
         
@@ -220,6 +346,15 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     }
 }
 
+- (void)renderCircleOnContext:(CGContextRef)context
+{
+    CGContextSetLineWidth(context, 8.0);
+    CGContextSetRGBFillColor(context, 191.0f/255, 0.0f, 0.0f, 1.0f);
+    CGContextSetRGBStrokeColor(context, 0, 0, 0, 1.0);
+    
+    CGRect circlePointRect = (CGRectMake((self.frame.size.width/2)-CIRCLE_RADIUS/2.0f, (self.frame.size.height/2)-CIRCLE_RADIUS/2.0f, CIRCLE_RADIUS, CIRCLE_RADIUS));
+    CGContextFillEllipseInRect(context, circlePointRect);
+}
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
@@ -229,16 +364,6 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     CGRect drawRect = CGRectMake(rect.origin.x, rect.origin.y,rect.size.width, rect.size.height);
     CGContextSetRGBFillColor(contextRef, 255.0f, 255.0f, 255.0f, 1.0f);
     CGContextFillRect(contextRef, drawRect);
-    
-    CGContextSetLineWidth(contextRef, 8.0);
-    CGContextSetRGBFillColor(contextRef, 0.0, 0.0, 0.0, 1.0);
-    CGContextSetRGBStrokeColor(contextRef, 0, 0, 0, 1.0);
-    
-    CGRect circlePointRect = (CGRectMake((rect.size.width/2)-CIRCLE_RADIUS/2.0f, (rect.size.height/2)-CIRCLE_RADIUS/2.0f, CIRCLE_RADIUS, CIRCLE_RADIUS));
-    CGContextFillEllipseInRect(contextRef, circlePointRect);
-    
-    /*CGRect arcRect = circlePointRect;
-    arcRect.size.height = 1;
     
     CGFloat minAngle = arcAngle - 10.0f;
     CGFloat maxAngle = arcAngle + 10.0f;
@@ -252,7 +377,7 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
         maxAngle -= 360.0f;
     }
     
-    UIBezierPath *aPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(rect.size.width/2, rect.size.width/2)
+    /*UIBezierPath *aPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(rect.size.width/2, rect.size.width/2)
                                                          radius:CIRCLE_RADIUS+ARC_CIRCLE_GAP
                                                      startAngle:DEGREES_TO_RADIANS(minAngle)
                                                        endAngle:DEGREES_TO_RADIANS(maxAngle)
@@ -262,8 +387,8 @@ void drawLinearGradient(CGContextRef context, CGRect rect, CGColorRef startColor
     
     [self drawArcPointsOnContext:contextRef];
     
-    [lightning renderDataOntoContext:contextRef];
-    
+    //[lightning renderDataOntoContext:contextRef];
+    [self renderCircleOnContext:contextRef];
 }
 
 

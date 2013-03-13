@@ -9,18 +9,12 @@
 #import "LightningData.h"
 #import "Vector2D.h"
 #import <Accelerate/Accelerate.h>
+#import "Common.h"
 
 #define NUM_GENERATIONS 5
 #define MAX_SPLIT_OFFSET 50.0f
 
 @implementation LightningData
-
-typedef struct Line
-{
-    CGPoint start;
-    CGPoint end;
-    float alpha;
-}CGLine;
 
 NSMutableArray * lineSegments;
 
@@ -37,6 +31,7 @@ NSMutableArray * lineSegments;
         CGFloat col[4] = {0.0f, 0.0f, 0.0f, l.alpha};
         
         CGContextSetStrokeColor(context, col);
+        CGContextSetShadowWithColor(context, CGSizeMake(1.0f, 1.0f), 3.0f, [UIColor redColor].CGColor);
         //CGContextMoveToPoint(context, 0.0f, 0.0f);
         CGContextMoveToPoint(context, l.start.x, l.start.y);
         CGContextAddLineToPoint(context, l.end.x, l.end.y);
@@ -44,35 +39,6 @@ NSMutableArray * lineSegments;
         
         //CGRect circlePointRect = (CGRectMake((perpPoint.x)-20.0f, (perpPoint.y)-20.0f, 40.0f, 40.0f));
         //CGContextFillEllipseInRect(context, circlePointRect);
-    }
-}
-
-// point along line decided by 0.0f->1.0f float
-- (CGPoint)intermediatePointOnLine:(CGLine)line atPoint:(CGFloat)t
-{
-    float p0[2] = { line.start.x, line.start.y };
-    float p1[2] = { line.end.x, line.end.y };
-    float delta[2] = { 0.0f, 0.0f };
-    
-    vDSP_vsub( &p0[0], 1, &p1[0], 1, &delta[0], 1, 2 );
-    
-    float distance;
-    vDSP_vdist( &delta[0], 1, &delta[1], 1, &distance, 1, 1 );
-    
-    if (distance == 0.0f)
-    {
-        return CGPointMake(p0[0], p0[1]);
-    }
-    else
-    {
-        float dir[2];
-        
-        vDSP_vsdiv( &delta[0], 1, &distance, &dir[0], 1, 2 );
-        
-        //Vector2 direction = delta / distance;
-        
-        //return p0 + direction * (distance * t);
-        return CGPointMake(p0[0] + dir[0] * (distance * t), p0[1] + dir[1] * (distance * t));
     }
 }
 
@@ -137,7 +103,7 @@ NSMutableArray * lineSegments;
             
             float splitpoint = ((((float)arc4random()/0x100000000)*100) - MAX_SPLIT_OFFSET) * offsetAmount;
             
-            CGPoint perpPoint = [self intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint] atPoint:0.5f];
+            CGPoint perpPoint = [Common intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint] atPoint:0.5f];
             
             CGLine firstHalf;
             CGLine secondHalf;
@@ -157,7 +123,7 @@ NSMutableArray * lineSegments;
             
             if(doSplit == 1)
             {
-                CGPoint branchPoint = [self intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint*2.0f] atPoint:1.0f];
+                CGPoint branchPoint = [Common intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint*2.0f] atPoint:1.0f];
                 
                 CGLine branch;
                 branch.start = perpPoint;
@@ -205,7 +171,7 @@ NSMutableArray * lineSegments;
             
             float splitpoint = ((((float)arc4random()/0x100000000)*100) - MAX_SPLIT_OFFSET) * offsetAmount;
             
-            CGPoint perpPoint = [self intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint] atPoint:0.5f];
+            CGPoint perpPoint = [Common intermediatePointOnLine:[self parralellOfLine:l withOffset:splitpoint] atPoint:0.5f];
             
             CGLine firstHalf;
             CGLine secondHalf;

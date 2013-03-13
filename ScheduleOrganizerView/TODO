@@ -7,3 +7,9 @@ Effects:
     effect/color between colliding arcs
     Radar-over-time effect
 Double Tap Zoom
+
+Lightning
+    - Circle growing/shrinking
+    - Particles off circle
+    - Glow/visual effect
+    - Max angle

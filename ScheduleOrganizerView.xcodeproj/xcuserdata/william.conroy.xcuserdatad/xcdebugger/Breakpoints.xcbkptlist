@@ -8,25 +8,25 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ScheduleOrganizerView/ScheduleOrganizerView.m"
-         timestampString = "384661108.673047"
+         timestampString = "384839534.980425"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "191"
-         endingLineNumber = "191"
-         landmarkName = "drawLinearGradient()"
-         landmarkType = "7">
+         startingLineNumber = "278"
+         endingLineNumber = "278"
+         landmarkName = "-touchesEnded:withEvent:"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
-         shouldBeEnabled = "Yes"
+         shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ScheduleOrganizerView/ScheduleOrganizerView.m"
-         timestampString = "384660145.365972"
+         timestampString = "384839534.980425"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "82"
-         endingLineNumber = "82"
-         landmarkName = "-checkIfTouchIsOnPoint:"
+         startingLineNumber = "113"
+         endingLineNumber = "113"
+         landmarkName = "-distanceFrom:to:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -47,11 +47,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "ScheduleOrganizerView/LightningData.m"
-         timestampString = "384664001.36147"
+         timestampString = "384672669.893471"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "186"
-         endingLineNumber = "186"
+         startingLineNumber = "187"
+         endingLineNumber = "187"
          landmarkName = "-regenerateBoltDataBetweenPoint:andPoint:"
          landmarkType = "5">
       </FileBreakpoint>

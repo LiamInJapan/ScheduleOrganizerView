@@ -22,6 +22,7 @@
 		6ADF958016E9A7B4002C6944 /* LightningData.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF957F16E9A7B4002C6944 /* LightningData.m */; };
 		6ADF958416E9BC78002C6944 /* Vector2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ADF958316E9BC78002C6944 /* Vector2D.m */; };
 		6ADF958616E9C64A002C6944 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ADF958516E9C64A002C6944 /* Accelerate.framework */; };
+		6AE5508016F040A1007ED201 /* Common.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AE5507F16F040A1007ED201 /* Common.m */; };
 		6AEDF46216E88C9000672F1D /* TODO in Resources */ = {isa = PBXBuildFile; fileRef = 6AEDF46116E88C9000672F1D /* TODO */; };
 /* End PBXBuildFile section */
 
@@ -49,6 +50,8 @@
 		6ADF958216E9BC78002C6944 /* Vector2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector2D.h; sourceTree = "<group>"; };
 		6ADF958316E9BC78002C6944 /* Vector2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Vector2D.m; sourceTree = "<group>"; };
 		6ADF958516E9C64A002C6944 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		6AE5507E16F040A1007ED201 /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
+		6AE5507F16F040A1007ED201 /* Common.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Common.m; sourceTree = "<group>"; };
 		6AEDF46116E88C9000672F1D /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +113,8 @@
 				6A90DBCF16E7444800CC8A0F /* ScheduleOrganizerView.m */,
 				6ADF957E16E9A7B4002C6944 /* LightningData.h */,
 				6ADF957F16E9A7B4002C6944 /* LightningData.m */,
+				6AE5507E16F040A1007ED201 /* Common.h */,
+				6AE5507F16F040A1007ED201 /* Common.m */,
 			);
 			path = ScheduleOrganizerView;
 			sourceTree = "<group>";
@@ -202,6 +207,7 @@
 				6A90DBD016E7444800CC8A0F /* ScheduleOrganizerView.m in Sources */,
 				6ADF958016E9A7B4002C6944 /* LightningData.m in Sources */,
 				6ADF958416E9BC78002C6944 /* Vector2D.m in Sources */,
+				6AE5508016F040A1007ED201 /* Common.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,7 +242,9 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: William Conroy (2AATS39BY9)";
+				"CODE_SIGN_IDENTITY[sdk=*]" = "iPhone Developer: William Conroy (2AATS39BY9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: William Conroy (2AATS39BY9)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -251,6 +259,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "2B956EFE-95E3-4E89-B0A8-8ADF015F9457";
+				"PROVISIONING_PROFILE[sdk=*]" = "2B956EFE-95E3-4E89-B0A8-8ADF015F9457";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "2B956EFE-95E3-4E89-B0A8-8ADF015F9457";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -264,7 +275,8 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: William Conroy (2AATS39BY9)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: William Conroy (2AATS39BY9)";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -272,6 +284,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				PROVISIONING_PROFILE = "2B956EFE-95E3-4E89-B0A8-8ADF015F9457";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "2B956EFE-95E3-4E89-B0A8-8ADF015F9457";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
